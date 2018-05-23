@@ -72,7 +72,7 @@ class StateTableView: UITableView {
         if errorView==nil {
             let dErrorView:DefaultTableErrorView = Bundle.main.loadNibNamed("DefaultTableErrorView", owner: nil, options: nil)?.first as! DefaultTableErrorView
             errorView=dErrorView
-        } 
+        }
         self.superview?.addSubview(loadView!)
         self.superview?.addSubview(emptyView!)
         self.superview?.addSubview(errorView!)
