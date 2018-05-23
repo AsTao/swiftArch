@@ -25,17 +25,15 @@ class StateTableView: UITableView {
     typealias refreshCallback = () -> Void
     typealias loadMoreCallback = () -> Void
     
-   private var refreshCallback:refreshCallback?
-   private var loadMoreCallback:loadMoreCallback?
+    private var refreshCallback:refreshCallback?
+    private var loadMoreCallback:loadMoreCallback?
     
     func setLoadView(view:UIView) {
         loadView=view;
     }
-    
     func setEmptyiew(view:UIView) {
         emptyView=view;
     }
-    
     
     func setErroriew(view:UIView) {
         errorView=view;
@@ -60,23 +58,21 @@ class StateTableView: UITableView {
     func setUpState()  {
         
         if loadView==nil {
-            let dLoadView:DefaultTableLoadView = Bundle.main.loadNibNamed("DefaultTableLoadView", owner: nil, options: nil)?.first as! DefaultTableLoadView
+            let dLoadView:DefaultTableLoadView=R.nib.defaultTableLoadView.firstView(owner: nil)!
             loadView=dLoadView
-        }
-        
+        } 
         if emptyView==nil {
-            let dEmptyView:DefaultTableEmptyView = Bundle.main.loadNibNamed("DefaultTableEmptyView", owner: nil, options: nil)?.first as! DefaultTableEmptyView
+            let dEmptyView:DefaultTableEmptyView=R.nib.defaultTableEmptyView.firstView(owner: nil)!
             emptyView=dEmptyView
         }
-        
         if errorView==nil {
-            let dErrorView:DefaultTableErrorView = Bundle.main.loadNibNamed("DefaultTableErrorView", owner: nil, options: nil)?.first as! DefaultTableErrorView
+            let dErrorView:DefaultTableErrorView=R.nib.defaultTableErrorView.firstView(owner: nil)!
             errorView=dErrorView
         }
-        self.superview?.addSubview(loadView!)
-        self.superview?.addSubview(emptyView!)
-        self.superview?.addSubview(errorView!)
-        
+     
+        self.addSubview(loadView!)
+        self.addSubview(emptyView!)
+        self.addSubview(errorView!)
         loadView?.snp.makeConstraints({ (make) in
             make.width.height.equalTo(self)
         })
@@ -92,20 +88,16 @@ class StateTableView: UITableView {
         if loadMoreFooter == nil {
             useDefaultFooterStyle()
         }
-        
-      
         self.mj_header=refreshHeader
         self.mj_footer=loadMoreFooter
-        
+        self.mj_footer.isHidden=true
         self.mj_header.setRefreshingTarget(self, refreshingAction: #selector(self.onRefresh))
         self.mj_footer.setRefreshingTarget(self, refreshingAction: #selector(self.onLoadMore))
-        self.showLoading()
-        
-        
         emptyView?.addTapGesture(handler: { (tap) in
             self.beginRefresh()
             self.showLoading()
         })
+        
         errorView?.addTapGesture(handler: { (tap) in
             self.beginRefresh()
             self.showLoading()
@@ -116,6 +108,8 @@ class StateTableView: UITableView {
         
     }
     @objc func onRefresh(){
+        
+        loadMoreFooter?.isHidden=true
         self.refreshCallback?()
     }
     
@@ -123,25 +117,39 @@ class StateTableView: UITableView {
         
         self.loadMoreCallback?()
     }
-    
-   public func showContent(){
+
+    private func hideAllCover(){
+        
         loadView?.isHidden=true
         emptyView?.isHidden=true
         errorView?.isHidden=true
     }
+
+   public func showContent(){
+    
+        self.endRefresh()
+        self.endLoadMore()
+        self.hideAllCover()
+    
+    }
     
    public func showLoading()  {
-        self.showContent()
+        self.hideAllCover()
         loadView?.isHidden=false
+        self.bringCoverToFront()
     }
     public func showEmpty()  {
+        
         self.showContent()
         emptyView?.isHidden=false
+        self.bringCoverToFront()
     }
     
     public func showError()  {
+        
         self.showContent()
         errorView?.isHidden=false
+        self.bringCoverToFront()
     }
     
     public func beginRefresh() {
@@ -149,7 +157,6 @@ class StateTableView: UITableView {
     }
     
     public func endRefresh(){
-        self.showContent()
         refreshHeader?.endRefreshing()
     }
     
@@ -188,7 +195,13 @@ class StateTableView: UITableView {
        (refreshHeader as! MJRefreshGifHeader).setImages(images, for: MJRefreshState.refreshing)
     }
     private func useDefaultFooterStyle(){
-        loadMoreFooter=MJRefreshAutoFooter()
+        loadMoreFooter=MJRefreshAutoNormalFooter()
+    }
+    
+    public func bringCoverToFront(){
+        self.bringSubview(toFront: emptyView!)
+        self.bringSubview(toFront: errorView!)
+        self.bringSubview(toFront: loadView!)
     }
   
 

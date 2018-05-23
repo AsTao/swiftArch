@@ -8,13 +8,17 @@
 
 import HandyJSON
 
-class Result<T>:HandyJSON{
+class Result<T>:NSObject,HandyJSON{
     
     var status:Int?
     var msg:String?
     var data:T?
    
-    required  init() {}
+    required  override init() {}
+    
+    func checkSuccess( ) -> Bool {
+        return status==0
+    }
     
      
      
