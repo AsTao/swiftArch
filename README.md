@@ -2,6 +2,14 @@
 
 swift开发框架
 
+简书详细说明地址 从零开始搭建swift开发框架 :https://www.jianshu.com/p/aac5dec83959  
+
+  
+
+说明文档: https://github.com/manondidi/swiftArch/blob/master/%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3.md
+
+
+
 todo:
 
 UI组件 
@@ -12,17 +20,29 @@ UI组件
 - [x] ​       可定制状态视图  
 - [x] ​       上下拉(可定制) 
 
-- [ ] collectionView(分页解耦)  暂时不打算做
+- [x] **collectionView(分页解耦)**  
 
 网络库
 
-- [ ] ​              请求聚合
+- [ ] ​              请求聚合(还没想到怎么做,替代方案是在service层用requestcount做聚合控制,详见
 
-- [ ] ​               缓存(基本完成,待优化)
+      SocialAppService -getBannerAndFeedArticle
+
+- [x] ​               缓存
+
 - [x] ​               自动解析模型<传入泛型>
+
 - [x] ​               参数封装 
+
 - [x] ​               url管理  
-- [ ] ​              网络日志
+
+- [x] ​              网络日志
+
+- [ ] ​             ~~上传(使用alamofire自带,已经很棒了)~~
+
+- [ ] ​              ~~下载(使用alamofire自带,已经很棒了)~~
+
+- [ ] ~~cookie(使用alamofire自带,已经很棒了)~~
 
 业务层  
 
@@ -33,13 +53,13 @@ UI组件
 - [x] ​		页面状态视图展示和个性化定制
    - [x] ​分页计算策略模式  
 - [x] 列表model解耦
-  - [x] section支持(为实现这个功能死了好多脑细胞)
+  - [x] section支持
 
 
 
 文档
 
-- [ ] ​		使用文档
+- [x] ​		使用文档
    - [x] ​详细例子
 
 
@@ -88,11 +108,61 @@ cmd+b build整个工程 如果成功 可以打开工程文件夹
 
 
 
-#### 说明
+#### 说明(没耐心看的直接从 6.PagingViewController 开始看 )
 
-还有许多新功能想做进去,等功能稳定后
+[使用文档](https://github.com/manondidi/swiftArch/blob/master/%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3.md)	
 
-过段时间会出一个设计文档和使用文档
+
+
+demo截图
+
+![](https://raw.githubusercontent.com/manondidi/swiftArch/master/%E6%88%AA%E5%9B%BE/demo%E9%A6%96%E9%A1%B5.png)
+
+
+
+
+
+![](https://raw.githubusercontent.com/manondidi/swiftArch/master/%E6%88%AA%E5%9B%BE/%E5%8A%A8%E6%80%81%E5%88%97%E8%A1%A8.png)
+
+
+
+![](https://raw.githubusercontent.com/manondidi/swiftArch/master/%E6%88%AA%E5%9B%BE/%E6%9C%80%E6%96%B0%E6%B8%B8%E6%88%8F%E5%88%97%E8%A1%A8-section.png))
+
+
+
+
+
+
+
+
+
+![](https://raw.githubusercontent.com/manondidi/swiftArch/master/%E6%88%AA%E5%9B%BE/%E8%AE%B0%E5%BF%86%E7%82%B9%E9%A6%96%E9%A1%B5.png)
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ ![多类型CollectionViewCell,自动分页](https://raw.githubusercontent.com/manondidi/swiftArch/master/%E6%88%AA%E5%9B%BE/多类型CollectionViewCell,自动分页.png)
+
+​    
+
+##### 
+
+
+
+ 
 
 
 

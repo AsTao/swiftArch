@@ -28,15 +28,20 @@ class MockService    {
         }
     }
     
+    // 获取banner
+    func getBanners(result: @escaping ((Result<Array<Banner>>)->())) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            result(self.loadJsonFromFile(fileName: "banner.json" ,model:Result<Array<Banner>>()));
+        }
+    }
     
     func loadJsonFromFile<T:HandyJSON>(fileName:String,model:T ) -> T {
         
         let jsonPath = Bundle.main.path(forResource: fileName, ofType: "")
-     
         let jsonStr=try?String(contentsOfFile: jsonPath!)
-       
-        let result:T = T.deserialize(from: jsonStr!)!
+        let result:T = JsonUtil.jsonParse(jsonStr: jsonStr)!
         return result
         
     }
+    
 }

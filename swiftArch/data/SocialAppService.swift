@@ -11,25 +11,26 @@ import UIKit
 ///一个service 持有一个httpclient
 ///我的意思是 一个httpclient管理一个baseUrl 通常对应一个系统
 ///同一个系统下面 head cookie 返回值result节点和 sucees条件是一样的
-class RemoteService {
+class SocialAppService {
     
-    let httpClient = HttpClient(baseUrl:DataManager.shareInstance.baseUrl,headers:["X-Requested-With":"XMLHttpRequest"])
+    let httpClient = HttpClient(baseUrl:DataManager.shareInstance.baseUrlSocail,headers:["X-Requested-With":"XMLHttpRequest"])
     let mockService:MockService=MockService();
+    
     
     
     typealias failureCallback = (_ statusCode:Int?,_ msg:String?) -> Void
     
     func getUser(userId:String,password:String,success:@escaping ((User?)->()),failure:@escaping failureCallback ){
-        httpClient.request(url: "user/{userId}", method: .get, pathParams: ["userId":userId ], params: ["password":password])
-            .responseModelAndCache(success: { (result:Result<User>,isCache:Bool) in
+        httpClient.request(url: "user/{userId}", method: .post, pathParams: ["userId":userId ], params: ["password":password])
+            .responseModelAndCache(readCache:true ,success: { (result:Result<User>,isCache:Bool) in
                 if(self.checkSuccess(result: result)){
                     success(self.getData(result: result))
                 }
                 else{
                     failure(result.status,result.msg)
                 }
-            }, failure: {statusCode,error in
-                failure(statusCode,error.localizedDescription)
+            }, failure: {statusCode,msg in
+                failure(statusCode,msg)
             })
     }
     
@@ -42,8 +43,8 @@ class RemoteService {
                 else{
                     failure(result.status,result.msg)
                 }
-            }, failure: {statusCode,error in
-                failure(statusCode,error.localizedDescription)
+            }, failure: {statusCode,msg in
+                failure(statusCode,msg)
             })
     }
     
@@ -61,8 +62,8 @@ class RemoteService {
                 else{
                     failure(result.status,result.msg)
                 }
-            }, failure: {statusCode,error in
-                failure(statusCode,error.localizedDescription)
+            }, failure: {statusCode,msg in
+                failure(statusCode,msg)
             })
     }
     
@@ -75,9 +76,11 @@ class RemoteService {
     func getFeedsMock(result callback: @escaping ((Array<SPFeedVM>)->())) {
         mockService.getFeeds { (result: Result<Array<Feed>>) in
             // 转换为VM
-            //            var feedVMs? = [SPFeedVM]()
             let tmpFeeds = result.data;
             let feedVMs = tmpFeeds?.map({ (feed: Feed) -> SPFeedVM in
+                if let retweetFeed = feed.payload?.post?.retweetFeed {
+                    retweetFeed.isRetweeted = true
+                }
                 let feedVM = SPFeedVM()
                 feedVM.feed = feed
                 return feedVM
@@ -85,6 +88,53 @@ class RemoteService {
             callback(feedVMs!)
         }
     }
+    func getBanners(success:@escaping ((Array<Banner>?)->()),failure:@escaping failureCallback ) {
+        mockService.getBanners { (result: Result<Array<Banner>>) in
+            success(result.data)
+        }
+    }
+    ///下拉刷新时候 一起请求banner和article的第一页,上拉加载只请求article
+    func getBannerAndFeedArticle(direction:String,pageSize:Int,offsetId:String?,success:@escaping ((Array<NSObject>?)->()),failure:@escaping failureCallback)  {
+        
+        if(direction=="new"){
+            var requestCount=2
+            var articles:Array<FeedArtileModel>=[]
+            let bannerVM:BannersVM=BannersVM()
+            self.getFeedArticle(direction: direction, pageSize: pageSize, offsetId: offsetId, success: { (artileList) in
+                requestCount-=1
+                articles=artileList!
+                if(requestCount==0){
+                    var list:Array<NSObject>=[NSObject]()
+                    list.append(bannerVM)
+                    list.append(contentsOf: articles)
+                    success(list)
+                }
+            }) { (code, msg) in
+                failure(code, msg)
+            }
+            self.getBanners(success: { (bannerList) in
+                requestCount-=1
+                 bannerVM.banners=bannerList
+                if(requestCount==0){
+                    var list:Array<NSObject>=[NSObject]()
+                    list.append(bannerVM)
+                    list.append(contentsOf: articles)
+                    success(list)
+                }
+            }) { (code, msg) in
+                failure(code, msg)
+            }
+        }
+        else{
+            self.getFeedArticle(direction: direction, pageSize: pageSize, offsetId: offsetId, success: { (artileList) in
+                    success(artileList)
+            }) { (code, msg) in
+                failure(code, msg)
+            }
+        }
+    }
+    
+    
     
    private func getData<T>(result:Result<T>)->T?{
         if self.checkSuccess(result: result) {
@@ -96,8 +146,8 @@ class RemoteService {
     }
      
     
-  private  func checkSuccess<T>(result:Result<T>) -> Bool {
-        return result.status==0
+  private  func checkSuccess(result:NSObject) -> Bool {
+        return true==result.value(forKey: "isSuccess") as? Bool
     }
 
 }
